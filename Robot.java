@@ -19,12 +19,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
 	private SendableChooser<String> driveSelector = new SendableChooser<>();
-	public DoubleSolenoid arm = new DoubleSolenoid(3, 2);
+	//public DoubleSolenoid vertical = new DoubleSolenoid(3,2);
+	public DoubleSolenoid horizontal = new DoubleSolenoid(3,2);
 	public Compressor comp = new Compressor();
 	
 	Joystick joystick = new Joystick(0);
-	public static boolean open;
-	public static boolean close;
+	public static boolean openVert;
+	public static boolean closeVert;
+	public int miniJoystick;
 	
 	//I2C colorSensor;
 	
@@ -50,21 +52,32 @@ public class Robot extends IterativeRobot {
 		leftSide = new Spark(0);
 		rightSide = new Spark(1);
 	}
-
+	
 	@Override
 	public void teleopPeriodic() {
 		steering();
 		
-		open = joystick.getRawButton(1);
-		close = joystick.getRawButton(2);
-		
-		if (open) {
-			arm.set(DoubleSolenoid.Value.kForward);
-		} else if (close) {
-			arm.set(DoubleSolenoid.Value.kReverse);
+		// Horizontal
+		miniJoystick = joystick.getPOV();
+		if (miniJoystick == 0 || miniJoystick == 45 || miniJoystick == 315) {
+			horizontal.set(DoubleSolenoid.Value.kForward);
+		} else if (miniJoystick == 135 || miniJoystick == 180 || miniJoystick == 225) {
+			horizontal.set(DoubleSolenoid.Value.kReverse);
 		} else {
-			arm.set(DoubleSolenoid.Value.kOff);
+			horizontal.set(DoubleSolenoid.Value.kOff);
 		}
+		
+		// Vertical
+		/*openVert = joystick.getRawButton(1);
+		closeVert = joystick.getRawButton(2);
+		
+		if (openVert) {
+			vertical.set(DoubleSolenoid.Value.kForward);
+		} else if (closeVert) {
+			vertical.set(DoubleSolenoid.Value.kReverse);
+		} else {
+			vertical.set(DoubleSolenoid.Value.kOff);
+		}*/
 	}
 	
 	public void steering() {
