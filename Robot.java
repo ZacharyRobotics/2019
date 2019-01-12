@@ -33,7 +33,7 @@ public class Robot extends IterativeRobot {
 		
 		driveSelector.addDefault("Point", "Point");
 		driveSelector.addObject("Point w/ speed control", "Point w/ speed control");
-		driveSelector.addObject("Z-Axis", "Z-Axis");
+		driveSelector.addObject("Z-Axis w/ speed control", "Z-Axis w/ speed control");
 		SmartDashboard.putData("Driving styles", driveSelector);
 		
 		leftSide = new Spark(0);
@@ -59,8 +59,9 @@ public class Robot extends IterativeRobot {
 				speed = .2;
 			}
 			
-			Boolean inXDeadzone = joystick.getX() > -.15 || joystick.getX() < .15;
+			double xValue = joystick.getX();
 			double yValue = -joystick.getY();
+			Boolean inXDeadzone = xValue < .15 && xValue > -.15;
 			if (inXDeadzone) {
 				if (yValue > .2) { // Forwards
 					leftSide.set(-speed);
@@ -73,22 +74,26 @@ public class Robot extends IterativeRobot {
 					rightSide.set(0);
 				}
 			} else {
-				double xValue = joystick.getX();
-				if (yValue > .2) { // Forwards
-					if (xValue > .15) {
+				Boolean xPos = xValue > 0;
+				if (yValue > .35) { // Forwards
+					if (xPos) {
 						leftSide.set(-speed);
-						rightSide.set(speed);
+						rightSide.set(speed - xValue); // Multiply?
 					}
-					
-				} else if (yValue < -.2) { // Backwards
+				} else if (yValue < -.35) { // Backwards
 					leftSide.set(speed);
 					rightSide.set(-speed);
 				} else { // Stationary
-					leftSide.set(0);
-					rightSide.set(0);
+					if (xPos) { // Right side of joystick
+						leftSide.set(speed);
+						rightSide.set(speed);
+					} else { // Left side of joystick
+						leftSide.set(-speed);
+						rightSide.set(-speed);
+					}
 				}
 			}
-		} else if (driveStyle == "Z-Axis") {
+		} else if (driveStyle == "Z-Axis w/ speed control") {
 			// Slider determines speed with z-axis turning
 			// PLAYERS: 
 			
