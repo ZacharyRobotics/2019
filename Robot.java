@@ -8,24 +8,30 @@
 package org.usfirst.frc.team6489.robot;
 
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.I2C;
 
 public class Robot extends IterativeRobot {
 	private SendableChooser<String> driveSelector = new SendableChooser<>();
+	public DoubleSolenoid arm = new DoubleSolenoid(3, 2);
+	public Compressor comp = new Compressor();
 	
 	Joystick joystick = new Joystick(0);
+	public static boolean open;
+	public static boolean close;
+	
+	//I2C colorSensor;
 	
 	/** Negative is forward **/
 	Spark leftSide;
 	/** Positive is forward **/
 	Spark rightSide;
-	
-	Timer timer;
 
 	@Override
 	public void robotInit() {
@@ -34,7 +40,12 @@ public class Robot extends IterativeRobot {
 		driveSelector.addDefault("Point", "Point");
 		driveSelector.addObject("Point w/ speed control", "Point w/ speed control");
 		driveSelector.addObject("Z-Axis w/ speed control", "Z-Axis w/ speed control");
+		driveSelector.addObject("Z-Axis", "Z-Axis");
 		SmartDashboard.putData("Driving styles", driveSelector);
+		
+		//colorSensor = new I2C(I2C.Port.kOnboard, 0x3C);
+		
+		comp.start();
 		
 		leftSide = new Spark(0);
 		rightSide = new Spark(1);
@@ -42,17 +53,32 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopPeriodic() {
+		steering();
+		
+		open = joystick.getRawButton(1);
+		close = joystick.getRawButton(2);
+		
+		if (open) {
+			arm.set(DoubleSolenoid.Value.kForward);
+		} else if (close) {
+			arm.set(DoubleSolenoid.Value.kReverse);
+		} else {
+			arm.set(DoubleSolenoid.Value.kOff);
+		}
+	}
+	
+	public void steering() {
 		String driveStyle = driveSelector.getSelected();
 		
 		if (driveStyle == "Point") {
 			// This makes the joystick work where the robot just goes where you point the stick
-			// PLAYERS: Payton, Jude
+			// PLAYERS: Jude
 			
 			leftSide.set(joystick.getX() + joystick.getY());
 			rightSide.set(joystick.getX() - joystick.getY());
 		} else if (driveStyle == "Point w/ speed control") {
 			// Slider determines speed with point to drive
-			// PLAYERS: Parker
+			// PLAYERS: Parker, Payton
 			
 			double speed = (-joystick.getThrottle() + 1) / 2; // Negative because the controls are reversed
 			if (speed < .2) {
@@ -119,41 +145,12 @@ public class Robot extends IterativeRobot {
 				leftSide.set(0);
 				rightSide.set(0);
 			}
+		} else if (driveStyle == "Z-Axis") {
+			// Makes forward/backward use Y axis and turning use Z axis
+			// PLAYERS: 
+			
+			leftSide.set((joystick.getZ() + joystick.getY()) * .5);
+			rightSide.set((joystick.getZ() - joystick.getY()) * .5);
 		}
-		
-		// Makes forward/backward use Y axis and turning use Z axis
-		//leftSide.set((joystick.getZ() + joystick.getY()) * .5);
-		//rightSide.set((joystick.getZ() - joystick.getY()) * .5);
 	}
 }
-
-
-/*
-int direction;
-if (joystick.getY() < -.2) {
-	// Forwards because reversed joystick
-	direction = 1;
-} else if (joystick.getY() > .2) {
-	// Backwards
-	direction = -1;
-} else {
-	// Stationary
-	direction = 0;
-}
-
-double speed = joystick.getThrottle();
-Boolean inXDeadzone = joystick.getX() > -.15 || joystick.getX() < .15;
-if (inXDeadzone) { // X-axis dead zone to make straight navigation easier
-	leftSide.set(-speed * direction);
-	rightSide.set(speed * direction);
-} else {
-	if (direction > 0) {
-		// Forwards
-		leftSide.set((joystick.getX() + speed + 1) * .65);
-		rightSide.set(-(joystick.getX() + speed + 1) * .65);
-	} else {
-		leftSide.set(-(joystick.getX() + speed + 1) * .65 * direction);
-		rightSide.set((joystick.getX() + speed + 1) * .65 * direction);
-	}
-}
-*/
