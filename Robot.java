@@ -7,12 +7,14 @@
 
 package org.usfirst.frc.team6489.robot;
 
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.I2C;
@@ -20,13 +22,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private SendableChooser<String> driveSelector = new SendableChooser<>();
 	//public DoubleSolenoid vertical = new DoubleSolenoid(3,2);
-	public DoubleSolenoid horizontal = new DoubleSolenoid(3,2);
-	public Compressor comp = new Compressor();
+	//public DoubleSolenoid horizontal = new DoubleSolenoid(3,2);
+	//public Compressor comp = new Compressor();
+	private ADXRS450_Gyro gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 	
 	Joystick joystick = new Joystick(0);
-	public static boolean openVert;
+	/*public static boolean openVert;
 	public static boolean closeVert;
-	public int miniJoystick;
+	public int miniJoystick;*/
 	
 	//I2C colorSensor;
 	
@@ -37,6 +40,8 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void robotInit() {
+		gyro.calibrate();
+		gyro.reset(); // Only rezeroes a second time if you restart the robot
 		CameraServer.getInstance().startAutomaticCapture();
 		
 		driveSelector.addDefault("Point", "Point");
@@ -47,7 +52,7 @@ public class Robot extends IterativeRobot {
 		
 		//colorSensor = new I2C(I2C.Port.kOnboard, 0x3C);
 		
-		comp.start();
+		//comp.start();
 		
 		leftSide = new Spark(0);
 		rightSide = new Spark(1);
@@ -57,15 +62,26 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		steering();
 		
+		// Handles the gyro display for the Smart Dashboard
+		if (gyro.getAngle() > 360 || gyro.getAngle() < -360) {
+			gyro.reset();
+			SmartDashboard.putNumber("Gyro angle ", gyro.getAngle());
+		} else if (gyro.getAngle() < 0) {
+			SmartDashboard.putNumber("Gyro angle ", 360 + gyro.getAngle());
+		} else {
+			SmartDashboard.putNumber("Gyro angle ", gyro.getAngle());
+		}
+		
+		
 		// Horizontal
-		miniJoystick = joystick.getPOV();
+		/*miniJoystick = joystick.getPOV();
 		if (miniJoystick == 0 || miniJoystick == 45 || miniJoystick == 315) {
 			horizontal.set(DoubleSolenoid.Value.kForward);
 		} else if (miniJoystick == 135 || miniJoystick == 180 || miniJoystick == 225) {
 			horizontal.set(DoubleSolenoid.Value.kReverse);
 		} else {
 			horizontal.set(DoubleSolenoid.Value.kOff);
-		}
+		}*/
 		
 		// Vertical
 		/*openVert = joystick.getRawButton(1);
