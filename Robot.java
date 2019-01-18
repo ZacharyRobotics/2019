@@ -9,8 +9,8 @@ package org.usfirst.frc.team6489.robot;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+//import edu.wpi.first.wpilibj.Compressor;
+//import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
 	private SendableChooser<String> driveSelector = new SendableChooser<>();
+	private SendableChooser<String> gyroSelector = new SendableChooser<>();
 	//public DoubleSolenoid vertical = new DoubleSolenoid(3,2);
 	//public DoubleSolenoid horizontal = new DoubleSolenoid(3,2);
 	//public Compressor comp = new Compressor();
@@ -50,6 +51,10 @@ public class Robot extends IterativeRobot {
 		driveSelector.addObject("Z-Axis", "Z-Axis");
 		SmartDashboard.putData("Driving styles", driveSelector);
 		
+		gyroSelector.addDefault("0 : 360", "0 : 360");
+		gyroSelector.addObject("-180 : 180", "-180 : 180");
+		SmartDashboard.putData("Gyro Selector", gyroSelector);
+		
 		//colorSensor = new I2C(I2C.Port.kOnboard, 0x3C);
 		
 		//comp.start();
@@ -63,13 +68,28 @@ public class Robot extends IterativeRobot {
 		steering();
 		
 		// Handles the gyro display for the Smart Dashboard
-		if (gyro.getAngle() > 360 || gyro.getAngle() < -360) {
-			gyro.reset();
-			SmartDashboard.putNumber("Gyro angle ", gyro.getAngle());
-		} else if (gyro.getAngle() < 0) {
-			SmartDashboard.putNumber("Gyro angle ", 360 + gyro.getAngle());
-		} else {
-			SmartDashboard.putNumber("Gyro angle ", gyro.getAngle());
+		String gyroStyle = gyroSelector.getSelected();
+		double angle = Math.floor(gyro.getAngle());
+		if (gyroStyle == "0 : 360") {
+			if (gyro.getAngle() > 360 || gyro.getAngle() < -360) {
+				gyro.reset();
+				SmartDashboard.putNumber("Gyro angle ", angle);
+			} else if (gyro.getAngle() < 0) {
+				SmartDashboard.putNumber("Gyro angle ", 360 + angle);
+			} else {
+				SmartDashboard.putNumber("Gyro angle ", angle);
+			}
+		} else if (gyroStyle == "-180 : 180") {
+			if (gyro.getAngle() > 360 || gyro.getAngle() < -360) {
+				gyro.reset();
+				SmartDashboard.putNumber("Gyro angle ", angle);
+			} else if (angle > -180 && angle <= 180) {
+				SmartDashboard.putNumber("Gyro angle ", angle);
+			} else if (angle < -180) {
+				SmartDashboard.putNumber("Gyro angle ", 360 + angle);
+			} else if (angle > 180) {
+				SmartDashboard.putNumber("Gyro angle ", angle - 360);
+			}
 		}
 		
 		
@@ -132,17 +152,31 @@ public class Robot extends IterativeRobot {
 				Boolean xPos = xValue > 0;
 				if (yValue > .35) { // Forwards
 					if (xPos) {
-						leftSide.set(-speed);
-						rightSide.set(speed - xValue); // Multiply?
+						System.out.println("xPos; yPos");
+						leftSide.set(speed);
+						rightSide.set(-speed + xValue);
+					} else {
+						System.out.println("xNeg; yPos");
+						leftSide.set(speed + xValue);
+						rightSide.set(-speed); // -speed + xValue
 					}
 				} else if (yValue < -.35) { // Backwards
-					leftSide.set(speed);
-					rightSide.set(-speed);
+					if (xPos) {
+						System.out.println("xPos; yPos");
+						leftSide.set(speed / 2);
+						rightSide.set((-speed - xValue) / 2);
+					} else {
+						System.out.println("xNeg; yPos");
+						leftSide.set((speed - xValue) / 2);
+						rightSide.set(-speed / 2);
+					}
 				} else { // Stationary
 					if (xPos) { // Right side of joystick
+						System.out.println("xPos; yNeg");
 						leftSide.set(speed);
 						rightSide.set(speed);
 					} else { // Left side of joystick
+						System.out.println("xNeg; yNeg");
 						leftSide.set(-speed);
 						rightSide.set(-speed);
 					}
@@ -178,8 +212,8 @@ public class Robot extends IterativeRobot {
 			// Makes forward/backward use Y axis and turning use Z axis
 			// PLAYERS: 
 			
-			leftSide.set((joystick.getZ() + joystick.getY()) * .5);
-			rightSide.set((joystick.getZ() - joystick.getY()) * .5);
+			leftSide.set((joystick.getZ() + joystick.getY()));
+			rightSide.set((joystick.getZ() - joystick.getY()));
 		}
 	}
 }
