@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.wpilibj.I2C;
 
 public class Robot extends IterativeRobot {
 	private SendableChooser<String> driveSelector = new SendableChooser<>();
@@ -43,7 +42,8 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		gyro.calibrate();
 		gyro.reset(); // Only rezeroes a second time if you restart the robot
-		CameraServer.getInstance().startAutomaticCapture();
+		CameraServer.getInstance().startAutomaticCapture(0);
+		CameraServer.getInstance().startAutomaticCapture(1);
 		
 		driveSelector.addDefault("Point", "Point");
 		driveSelector.addObject("Point w/ speed control", "Point w/ speed control");

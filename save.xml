@@ -1,0 +1,54 @@
+<xml version="1.0">
+<dashboard>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
+		<location x="869" y="74"/>
+		<width>106</width>
+		<height>69</height>
+		<property name="Text" value="Back"/>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
+		<location x="307" y="90"/>
+		<width>90</width>
+		<height>36</height>
+		<property name="Text" value="Front"/>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.CameraServerViewer">
+		<location x="651" y="120"/>
+		<width>544</width>
+		<height>403</height>
+		<property name="Camera Choice" value="USB Camera 1"/>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
+		<location x="226" y="-1"/>
+		<width>87</width>
+		<height>30</height>
+		<property name="Text" value="Gyro Style"/>
+	</static-widget>
+	<widget field="Gyro Selector" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="219" y="15"/>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
+		<location x="10" y="1"/>
+		<width>115</width>
+		<height>26</height>
+		<property name="Text" value="Driving Style"/>
+	</static-widget>
+	<widget field="Gyro angle " type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="415" y="21"/>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.CameraServerViewer">
+		<location x="111" y="120"/>
+		<width>534</width>
+		<height>403</height>
+		<property name="Camera Choice" value=""/>
+	</static-widget>
+	<widget field="Auto choices" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="18" y="5"/>
+	</widget>
+	<widget field="Driving styles" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="12" y="18"/>
+	</widget>
+</dashboard>
+<live-window>
+</live-window>
+</xml>
