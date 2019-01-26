@@ -21,15 +21,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private SendableChooser<String> driveSelector = new SendableChooser<>();
 	private SendableChooser<String> gyroSelector = new SendableChooser<>();
-	public DoubleSolenoid vertical = new DoubleSolenoid(2,3);
+	/*public DoubleSolenoid vertical = new DoubleSolenoid(2,3);
 	public DoubleSolenoid horizontal = new DoubleSolenoid(0,1);
 	public Compressor comp = new Compressor();
-	private ADXRS450_Gyro gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+	private ADXRS450_Gyro gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);*/
 	
 	Joystick joystick = new Joystick(0);
-	public static boolean openVert;
+	/*public static boolean openVert;
 	public static boolean closeVert;
-	public int miniJoystick;
+	public int miniJoystick;*/
 
 	/** Negative is forward **/
 	Spark leftSide;
@@ -38,9 +38,11 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void robotInit() {
-		gyro.calibrate();
-		gyro.reset(); // Only rezeroes a second time if you restart the robot
+		//gyro.calibrate();
+		//gyro.reset(); // Only rezeroes a second time if you restart the robot
 		
+		// Red line to show center of camera
+		SmartDashboard.putString(" ", " ");
 		CameraServer.getInstance().startAutomaticCapture(0);
 		CameraServer.getInstance().startAutomaticCapture(1);
 		
@@ -54,7 +56,7 @@ public class Robot extends IterativeRobot {
 		gyroSelector.addObject("-180 : 180", "-180 : 180");
 		SmartDashboard.putData("Gyro Selector", gyroSelector);
 
-		comp.start();
+		//comp.start();
 		
 		leftSide = new Spark(0);
 		rightSide = new Spark(1);
@@ -65,7 +67,7 @@ public class Robot extends IterativeRobot {
 		steering();
 		
 		// Handles the gyro display for the Smart Dashboard
-		String gyroStyle = gyroSelector.getSelected();
+		/*String gyroStyle = gyroSelector.getSelected();
 		double angle = Math.floor(gyro.getAngle());
 		if (gyroStyle == "0 : 360") {
 			if (gyro.getAngle() > 360 || gyro.getAngle() < -360) {
@@ -87,11 +89,11 @@ public class Robot extends IterativeRobot {
 			} else if (angle > 180) {
 				SmartDashboard.putNumber("Gyro angle ", angle - 360);
 			}
-		}
+		}*/
 		
 		
 		// Horizontal
-		miniJoystick = joystick.getPOV();
+		/*miniJoystick = joystick.getPOV();
 		if (miniJoystick == 0 || miniJoystick == 45 || miniJoystick == 315) {
 			horizontal.set(DoubleSolenoid.Value.kForward);
 		} else if (miniJoystick == 135 || miniJoystick == 180 || miniJoystick == 225) {
@@ -110,7 +112,7 @@ public class Robot extends IterativeRobot {
 			vertical.set(DoubleSolenoid.Value.kReverse);
 		} else {
 			vertical.set(DoubleSolenoid.Value.kOff);
-		}
+		}*/
 	}
 	
 	public void steering() {
