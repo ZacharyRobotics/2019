@@ -9,8 +9,8 @@ package org.usfirst.frc.team6489.robot;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
-//import edu.wpi.first.wpilibj.Compressor;
-//import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
@@ -21,18 +21,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private SendableChooser<String> driveSelector = new SendableChooser<>();
 	private SendableChooser<String> gyroSelector = new SendableChooser<>();
-	//public DoubleSolenoid vertical = new DoubleSolenoid(3,2);
-	//public DoubleSolenoid horizontal = new DoubleSolenoid(3,2);
-	//public Compressor comp = new Compressor();
+	public DoubleSolenoid vertical = new DoubleSolenoid(2,3);
+	public DoubleSolenoid horizontal = new DoubleSolenoid(0,1);
+	public Compressor comp = new Compressor();
 	private ADXRS450_Gyro gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 	
 	Joystick joystick = new Joystick(0);
-	/*public static boolean openVert;
+	public static boolean openVert;
 	public static boolean closeVert;
-	public int miniJoystick;*/
-	
-	//I2C colorSensor;
-	
+	public int miniJoystick;
+
 	/** Negative is forward **/
 	Spark leftSide;
 	/** Positive is forward **/
@@ -42,6 +40,7 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		gyro.calibrate();
 		gyro.reset(); // Only rezeroes a second time if you restart the robot
+		
 		CameraServer.getInstance().startAutomaticCapture(0);
 		CameraServer.getInstance().startAutomaticCapture(1);
 		
@@ -54,10 +53,8 @@ public class Robot extends IterativeRobot {
 		gyroSelector.addDefault("0 : 360", "0 : 360");
 		gyroSelector.addObject("-180 : 180", "-180 : 180");
 		SmartDashboard.putData("Gyro Selector", gyroSelector);
-		
-		//colorSensor = new I2C(I2C.Port.kOnboard, 0x3C);
-		
-		//comp.start();
+
+		comp.start();
 		
 		leftSide = new Spark(0);
 		rightSide = new Spark(1);
@@ -94,17 +91,17 @@ public class Robot extends IterativeRobot {
 		
 		
 		// Horizontal
-		/*miniJoystick = joystick.getPOV();
+		miniJoystick = joystick.getPOV();
 		if (miniJoystick == 0 || miniJoystick == 45 || miniJoystick == 315) {
 			horizontal.set(DoubleSolenoid.Value.kForward);
 		} else if (miniJoystick == 135 || miniJoystick == 180 || miniJoystick == 225) {
 			horizontal.set(DoubleSolenoid.Value.kReverse);
 		} else {
 			horizontal.set(DoubleSolenoid.Value.kOff);
-		}*/
+		}
 		
 		// Vertical
-		/*openVert = joystick.getRawButton(1);
+		openVert = joystick.getRawButton(1);
 		closeVert = joystick.getRawButton(2);
 		
 		if (openVert) {
@@ -113,7 +110,7 @@ public class Robot extends IterativeRobot {
 			vertical.set(DoubleSolenoid.Value.kReverse);
 		} else {
 			vertical.set(DoubleSolenoid.Value.kOff);
-		}*/
+		}
 	}
 	
 	public void steering() {
