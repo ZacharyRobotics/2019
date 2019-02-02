@@ -1,5 +1,11 @@
 <xml version="1.0">
 <dashboard>
+	<widget field=" " type="String" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="387" y="322"/>
+		<width>10</width>
+		<height>200</height>
+		<property name="Background" value="255.0.51.255"/>
+	</widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
 		<location x="869" y="74"/>
 		<width>106</width>
@@ -16,6 +22,7 @@
 		<location x="651" y="120"/>
 		<width>544</width>
 		<height>403</height>
+		<property name="Degrees Rotation" value="180"/>
 		<property name="Camera Choice" value="USB Camera 1"/>
 	</static-widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
@@ -50,5 +57,40 @@
 	</widget>
 </dashboard>
 <live-window>
+	<widget field="Ungrouped" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<widget field="DoubleSolenoid[0,3]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="0" y="0"/>
+			<height>0</height>
+			<width>0</width>
+		</widget>
+		<widget field="DoubleSolenoid[0,3]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="0" y="0"/>
+			<height>0</height>
+			<width>0</width>
+		</widget>
+		<widget field="Compressor[0]" type="Compressor" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalOutputController">
+			<location x="92" y="18"/>
+			<height>25</height>
+			<width>135</width>
+		</widget>
+		<widget field="ADXRS450_Gyro[0]" type="Gyro" class="edu.wpi.first.smartdashboard.gui.elements.Compass">
+			<location x="6" y="43"/>
+			<height>150</height>
+			<width>309</width>
+		</widget>
+		<widget field="Spark[0]" type="Speed Controller" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
+			<location x="6" y="193"/>
+			<height>51</height>
+			<width>309</width>
+		</widget>
+		<widget field="Spark[1]" type="Speed Controller" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
+			<location x="6" y="244"/>
+			<height>51</height>
+			<width>309</width>
+		</widget>
+		<location x="0" y="0"/>
+		<width>321</width>
+		<height>302</height>
+	</widget>
 </live-window>
 </xml>

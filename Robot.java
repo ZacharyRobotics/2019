@@ -21,15 +21,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private SendableChooser<String> driveSelector = new SendableChooser<>();
 	private SendableChooser<String> gyroSelector = new SendableChooser<>();
-	/*public DoubleSolenoid vertical = new DoubleSolenoid(2,3);
-	public DoubleSolenoid horizontal = new DoubleSolenoid(0,1);
+	public DoubleSolenoid horizontal = new DoubleSolenoid(3,2);
 	public Compressor comp = new Compressor();
-	private ADXRS450_Gyro gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);*/
+	private ADXRS450_Gyro gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 	
 	Joystick joystick = new Joystick(0);
-	/*public static boolean openVert;
-	public static boolean closeVert;
-	public int miniJoystick;*/
+	public int miniJoystick;
+
+	public Boolean toggle = false;
+	public Boolean previousToggleButton = false;
+	public Boolean currentToggleButton = false;
 
 	/** Negative is forward **/
 	Spark leftSide;
@@ -38,8 +39,8 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void robotInit() {
-		//gyro.calibrate();
-		//gyro.reset(); // Only rezeroes a second time if you restart the robot
+		gyro.calibrate();
+		gyro.reset(); // Only rezeroes a second time if you restart the robot
 		
 		// Red line to show center of camera
 		SmartDashboard.putString(" ", " ");
@@ -56,7 +57,7 @@ public class Robot extends IterativeRobot {
 		gyroSelector.addObject("-180 : 180", "-180 : 180");
 		SmartDashboard.putData("Gyro Selector", gyroSelector);
 
-		//comp.start();
+		comp.start();
 		
 		leftSide = new Spark(0);
 		rightSide = new Spark(1);
@@ -65,54 +66,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		steering();
-		
-		// Handles the gyro display for the Smart Dashboard
-		/*String gyroStyle = gyroSelector.getSelected();
-		double angle = Math.floor(gyro.getAngle());
-		if (gyroStyle == "0 : 360") {
-			if (gyro.getAngle() > 360 || gyro.getAngle() < -360) {
-				gyro.reset();
-				SmartDashboard.putNumber("Gyro angle ", angle);
-			} else if (gyro.getAngle() < 0) {
-				SmartDashboard.putNumber("Gyro angle ", 360 + angle);
-			} else {
-				SmartDashboard.putNumber("Gyro angle ", angle);
-			}
-		} else if (gyroStyle == "-180 : 180") {
-			if (gyro.getAngle() > 360 || gyro.getAngle() < -360) {
-				gyro.reset();
-				SmartDashboard.putNumber("Gyro angle ", angle);
-			} else if (angle > -180 && angle <= 180) {
-				SmartDashboard.putNumber("Gyro angle ", angle);
-			} else if (angle < -180) {
-				SmartDashboard.putNumber("Gyro angle ", 360 + angle);
-			} else if (angle > 180) {
-				SmartDashboard.putNumber("Gyro angle ", angle - 360);
-			}
-		}*/
-		
-		
-		// Horizontal
-		/*miniJoystick = joystick.getPOV();
-		if (miniJoystick == 0 || miniJoystick == 45 || miniJoystick == 315) {
-			horizontal.set(DoubleSolenoid.Value.kForward);
-		} else if (miniJoystick == 135 || miniJoystick == 180 || miniJoystick == 225) {
-			horizontal.set(DoubleSolenoid.Value.kReverse);
-		} else {
-			horizontal.set(DoubleSolenoid.Value.kOff);
-		}
-		
-		// Vertical
-		openVert = joystick.getRawButton(1);
-		closeVert = joystick.getRawButton(2);
-		
-		if (openVert) {
-			vertical.set(DoubleSolenoid.Value.kForward);
-		} else if (closeVert) {
-			vertical.set(DoubleSolenoid.Value.kReverse);
-		} else {
-			vertical.set(DoubleSolenoid.Value.kOff);
-		}*/
+		gyroDisplay();
+		managePayload();
 	}
 	
 	public void steering() {
@@ -126,7 +81,7 @@ public class Robot extends IterativeRobot {
 			rightSide.set(joystick.getX() - joystick.getY());
 		} else if (driveStyle == "Point w/ speed control") {
 			// Slider determines speed with point to drive
-			// PLAYERS: Parker, Payton
+			// PLAYERS:
 			
 			double speed = (-joystick.getThrottle() + 1) / 2; // Negative because the controls are reversed
 			if (speed < .2) {
@@ -209,10 +164,63 @@ public class Robot extends IterativeRobot {
 			}
 		} else if (driveStyle == "Z-Axis") {
 			// Makes forward/backward use Y axis and turning use Z axis
-			// PLAYERS: 
+			// PLAYERS: Parker, Dylan
 			
-			leftSide.set((joystick.getZ() + joystick.getY()));
-			rightSide.set((joystick.getZ() - joystick.getY()));
+			previousToggleButton = currentToggleButton;
+			currentToggleButton = joystick.getRawButton(1); // Trigger
+
+			if (currentToggleButton && !previousToggleButton) {
+				toggle = toggle ? false : true;
+			}
+			
+			double left = joystick.getZ() + joystick.getY();
+			double right = joystick.getZ() - joystick.getY();
+			leftSide.set(toggle ? left * .5 : left);
+			rightSide.set(toggle ? right * .5 : right);
+		}
+	}
+	
+	public void gyroDisplay() {
+		// Handles the gyro display for the Smart Dashboard
+		String gyroStyle = gyroSelector.getSelected();
+		double angle = Math.floor(gyro.getAngle());
+		if (gyroStyle == "0 : 360") {
+			if (gyro.getAngle() > 360 || gyro.getAngle() < -360) {
+				gyro.reset();
+				SmartDashboard.putNumber("Gyro angle ", angle);
+			} else if (gyro.getAngle() < 0) {
+				SmartDashboard.putNumber("Gyro angle ", 360 + angle);
+			} else {
+				SmartDashboard.putNumber("Gyro angle ", angle);
+			}
+		} else if (gyroStyle == "-180 : 180") {
+			if (gyro.getAngle() > 360 || gyro.getAngle() < -360) {
+				gyro.reset();
+				SmartDashboard.putNumber("Gyro angle ", angle);
+			} else if (angle > -180 && angle <= 180) {
+				SmartDashboard.putNumber("Gyro angle ", angle);
+			} else if (angle < -180) {
+				SmartDashboard.putNumber("Gyro angle ", 360 + angle);
+			} else if (angle > 180) {
+				SmartDashboard.putNumber("Gyro angle ", angle - 360);
+			}
+		}
+	}
+	
+	public void managePayload() {
+		miniJoystick = joystick.getPOV();
+		if (miniJoystick == 0 || miniJoystick == 45 || miniJoystick == 315) {
+			// Pushes piston out and pulls it in after half a second
+			horizontal.set(DoubleSolenoid.Value.kForward);
+			try {
+				Thread.sleep(500);
+				horizontal.set(DoubleSolenoid.Value.kReverse);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			horizontal.set(DoubleSolenoid.Value.kOff);
 		}
 	}
 }
