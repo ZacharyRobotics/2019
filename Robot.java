@@ -28,6 +28,10 @@ public class Robot extends IterativeRobot {
 	Joystick joystick = new Joystick(0);
 	public int miniJoystick;
 
+	public Boolean driveToggle = false;
+	public Boolean previousDriveToggle = false;
+	public Boolean currentDriveToggle = false;
+	
 	public Boolean toggle = false;
 	public Boolean previousToggleButton = false;
 	public Boolean currentToggleButton = false;
@@ -72,13 +76,44 @@ public class Robot extends IterativeRobot {
 	
 	public void steering() {
 		String driveStyle = driveSelector.getSelected();
+		previousDriveToggle = currentToggleButton;
+		currentDriveToggle = joystick.getRawButton(2); // Joystick side button
+
+		if (currentDriveToggle && !previousDriveToggle) {
+			driveToggle = driveToggle ? false : true;
+		}
+		
+		// Is there a way to toggle the currently selected method? (On Drive Station)
+		if (driveToggle) {
+			if (driveStyle == "Point") {
+				driveStyle = "Z-Axis";
+			} else if (driveStyle == "Z-Axis") {
+				driveStyle = "Point";
+			}
+		}
+		
+		
+		previousToggleButton = currentToggleButton;
+		currentToggleButton = joystick.getRawButton(1); // Trigger
+
+		if (currentToggleButton && !previousToggleButton) {
+			toggle = toggle ? false : true;
+		}
+		
+		if (toggle) {
+			SmartDashboard.putString("SPEED TOGGLED: ", "YES");
+		} else {
+			SmartDashboard.putString("SPEED TOGGLED: ", "NO");
+		}
 		
 		if (driveStyle == "Point") {
 			// This makes the joystick work where the robot just goes where you point the stick
 			// PLAYERS: Jude
 			
-			leftSide.set(joystick.getX() + joystick.getY());
-			rightSide.set(joystick.getX() - joystick.getY());
+			double left = joystick.getX() + joystick.getY();
+			double right = joystick.getX() - joystick.getY();
+			leftSide.set(toggle ? left * .5 : left);
+			rightSide.set(toggle ? right * .5 : right);
 		} else if (driveStyle == "Point w/ speed control") {
 			// Slider determines speed with point to drive
 			// PLAYERS:
@@ -165,13 +200,6 @@ public class Robot extends IterativeRobot {
 		} else if (driveStyle == "Z-Axis") {
 			// Makes forward/backward use Y axis and turning use Z axis
 			// PLAYERS: Parker, Dylan
-			
-			previousToggleButton = currentToggleButton;
-			currentToggleButton = joystick.getRawButton(1); // Trigger
-
-			if (currentToggleButton && !previousToggleButton) {
-				toggle = toggle ? false : true;
-			}
 			
 			double left = joystick.getZ() + joystick.getY();
 			double right = joystick.getZ() - joystick.getY();
