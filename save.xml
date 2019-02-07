@@ -1,5 +1,12 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="  " type="String" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="617" y="-5"/>
+		<width>815</width>
+		<height>104</height>
+		<property name="Foreground" value="255.0.51.255"/>
+		<property name="Font Size" value="48"/>
+	</widget>
 	<widget field="SPEED TOGGLED: " type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="377" y="55"/>
 	</widget>
@@ -61,59 +68,39 @@
 </dashboard>
 <live-window>
 	<widget field="Ungrouped" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
-		<widget field="DoubleSolenoid[0,3]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+		<widget field="Spark[1]" type="Speed Controller" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
 			<location x="0" y="0"/>
 			<height>0</height>
 			<width>0</width>
 		</widget>
-		<widget field="DoubleSolenoid[0,3]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+		<widget field="Spark[1]" type="Speed Controller" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
 			<location x="0" y="0"/>
 			<height>0</height>
 			<width>0</width>
 		</widget>
-		<widget field="Compressor[0]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalOutputController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
+		<widget field="Compressor[0]" type="Compressor" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalOutputController">
+			<location x="93" y="18"/>
+			<height>25</height>
+			<width>135</width>
 		</widget>
-		<widget field="Compressor[0]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalOutputController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
+		<widget field="ADXRS450_Gyro[0]" type="Gyro" class="edu.wpi.first.smartdashboard.gui.elements.Compass">
+			<location x="6" y="43"/>
+			<height>150</height>
+			<width>309</width>
 		</widget>
-		<widget field="ADXRS450_Gyro[0]" type="Table" class="edu.wpi.first.smartdashboard.gui.elements.Compass">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
+		<widget field="Spark[0]" type="Speed Controller" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
+			<location x="6" y="193"/>
+			<height>51</height>
+			<width>309</width>
 		</widget>
-		<widget field="ADXRS450_Gyro[0]" type="Table" class="edu.wpi.first.smartdashboard.gui.elements.Compass">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="Spark[0]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="Spark[0]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="Spark[1]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="Spark[1]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
+		<widget field="DoubleSolenoid[0,3]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="6" y="244"/>
+			<height>22</height>
+			<width>309</width>
 		</widget>
 		<location x="0" y="0"/>
 		<width>321</width>
-		<height>302</height>
+		<height>273</height>
 	</widget>
 </live-window>
 </xml>

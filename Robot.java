@@ -28,6 +28,7 @@ public class Robot extends IterativeRobot {
 	Joystick joystick = new Joystick(0);
 	public int miniJoystick;
 
+	private long lastToggleTime;
 	public Boolean driveToggle = false;
 	public Boolean previousDriveToggle = false;
 	public Boolean currentDriveToggle = false;
@@ -78,9 +79,11 @@ public class Robot extends IterativeRobot {
 		String driveStyle = driveSelector.getSelected();
 		previousDriveToggle = currentToggleButton;
 		currentDriveToggle = joystick.getRawButton(2); // Joystick side button
-
-		if (currentDriveToggle && !previousDriveToggle) {
+		
+		// Only toggles if it has been more than half a second after the last toggle
+		if (currentDriveToggle && !previousDriveToggle && System.currentTimeMillis() >= lastToggleTime + 500) {
 			driveToggle = driveToggle ? false : true;
+			lastToggleTime = System.currentTimeMillis();
 		}
 		
 		// Is there a way to toggle the currently selected method? (On Drive Station)
@@ -105,6 +108,9 @@ public class Robot extends IterativeRobot {
 		} else {
 			SmartDashboard.putString("SPEED TOGGLED: ", "NO");
 		}
+		
+		// Leave it as two spaces b/c unique identifier
+		SmartDashboard.putString("  ", "  " + driveStyle);
 		
 		if (driveStyle == "Point") {
 			// This makes the joystick work where the robot just goes where you point the stick
@@ -237,17 +243,18 @@ public class Robot extends IterativeRobot {
 	
 	public void managePayload() {
 		miniJoystick = joystick.getPOV();
-		if (miniJoystick == 0 || miniJoystick == 45 || miniJoystick == 315) {
+		if (miniJoystick == 315 || miniJoystick == 0 || miniJoystick == 45) {
 			// Pushes piston out and pulls it in after half a second
-			horizontal.set(DoubleSolenoid.Value.kForward);
+			horizontal.set(DoubleSolenoid.Value.kReverse);
 			try {
 				Thread.sleep(500);
-				horizontal.set(DoubleSolenoid.Value.kReverse);
+				horizontal.set(DoubleSolenoid.Value.kForward);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {
+			// If piston automatically triggers, move air compressor start to here...
 			horizontal.set(DoubleSolenoid.Value.kOff);
 		}
 	}
