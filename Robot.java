@@ -21,12 +21,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private SendableChooser<String> driveSelector = new SendableChooser<>();
 	private SendableChooser<String> gyroSelector = new SendableChooser<>();
+	private SendableChooser<String> pistonSelector = new SendableChooser<>();
 	public DoubleSolenoid horizontal = new DoubleSolenoid(3,2);
 	public Compressor comp = new Compressor();
 	private ADXRS450_Gyro gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 	
 	Joystick joystick = new Joystick(0);
 	public int miniJoystick;
+	public Boolean firstRun = true;
 
 	private long lastToggleTime;
 	public Boolean driveToggle = false;
@@ -61,6 +63,10 @@ public class Robot extends IterativeRobot {
 		gyroSelector.addDefault("0 : 360", "0 : 360");
 		gyroSelector.addObject("-180 : 180", "-180 : 180");
 		SmartDashboard.putData("Gyro Selector", gyroSelector);
+		
+		pistonSelector.addDefault("Manual", "Manual");
+		pistonSelector.addObject("Automatic", "Automatic");
+		SmartDashboard.putData("Piston Selector", pistonSelector);
 
 		comp.start();
 		
@@ -207,6 +213,7 @@ public class Robot extends IterativeRobot {
 			// Makes forward/backward use Y axis and turning use Z axis
 			// PLAYERS: Parker, Dylan
 			
+			
 			double left = joystick.getZ() + joystick.getY();
 			double right = joystick.getZ() - joystick.getY();
 			leftSide.set(toggle ? left * .5 : left);
@@ -242,18 +249,32 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void managePayload() {
+		String pistonStyle = pistonSelector.getSelected();
+		
 		miniJoystick = joystick.getPOV();
 		if (miniJoystick == 315 || miniJoystick == 0 || miniJoystick == 45) {
-			// Pushes piston out and pulls it in after half a second
+			SmartDashboard.putString("Piston: ", " OUT");
 			horizontal.set(DoubleSolenoid.Value.kReverse);
-			try {
-				Thread.sleep(500);
-				horizontal.set(DoubleSolenoid.Value.kForward);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			
+			if (pistonStyle == "Automatic") {
+				// Pushes piston out and pulls it in
+				try {
+					Thread.sleep(1500);
+					horizontal.set(DoubleSolenoid.Value.kForward);
+					SmartDashboard.putString("Piston: ", " IN");
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
+		} else if (miniJoystick == 135 || miniJoystick == 180 || miniJoystick == 225) {
+			SmartDashboard.putString("Piston: ", " IN");
+			horizontal.set(DoubleSolenoid.Value.kForward);
 		} else {
+			if (firstRun) {
+				SmartDashboard.putString("Piston: ", " IN");
+				firstRun = false;
+			}
+			
 			// If piston automatically triggers, move air compressor start to here...
 			horizontal.set(DoubleSolenoid.Value.kOff);
 		}
