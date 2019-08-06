@@ -5,32 +5,34 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.usfirst.frc.team6489.robot;
+package frc.robot;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer; // NOTE: I changed this from same package
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.TimedRobot; // NOTE: Changed from iterative
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Robot extends IterativeRobot {
-	private SendableChooser<String> driveSelector = new SendableChooser<>();
-	private SendableChooser<String> gyroSelector = new SendableChooser<>();
-	private SendableChooser<String> pistonSelector = new SendableChooser<>();
-	public DoubleSolenoid horizontal = new DoubleSolenoid(3,2);
+// TODO: Test timed vs. iterative
+public class Robot extends TimedRobot {
+	public SendableChooser<String> driveSelector = new SendableChooser<>();
+	public SendableChooser<String> gyroSelector = new SendableChooser<>();
+	public SendableChooser<String> pistonSelector = new SendableChooser<>();
+	public DoubleSolenoid horizontal = new DoubleSolenoid(0,1);
 	public Compressor comp = new Compressor();
-	private ADXRS450_Gyro gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+	public ADXRS450_Gyro gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 	
-	Joystick joystick = new Joystick(0);
+	public Joystick joystick = new Joystick(0);
 	public int miniJoystick;
 	public Boolean firstRun = true;
 
-	private long lastToggleTime;
+	public long lastToggleTime;
 	public Boolean driveToggle = false;
 	public Boolean previousDriveToggle = false;
 	public Boolean currentDriveToggle = false;
@@ -43,7 +45,7 @@ public class Robot extends IterativeRobot {
 	Spark leftSide;
 	/** Positive is forward **/
 	Spark rightSide;
-
+	
 	@Override
 	public void robotInit() {
 		gyro.calibrate();
@@ -51,27 +53,42 @@ public class Robot extends IterativeRobot {
 		
 		// Red line to show center of camera
 		SmartDashboard.putString(" ", " ");
+		/*UsbCamera front = CameraServer.getInstance().startAutomaticCapture(0);
+		front.setResolution(128, 240);
+		front.setFPS(30);
+
+		UsbCamera back = CameraServer.getInstance().startAutomaticCapture(0);
+		back.setResolution(128, 240);
+		back.setFPS(30);*/
+		// Webcam
+
 		CameraServer.getInstance().startAutomaticCapture(0);
 		CameraServer.getInstance().startAutomaticCapture(1);
 		
-		driveSelector.addDefault("Point", "Point");
-		driveSelector.addObject("Point w/ speed control", "Point w/ speed control");
-		driveSelector.addObject("Z-Axis w/ speed control", "Z-Axis w/ speed control");
-		driveSelector.addObject("Z-Axis", "Z-Axis");
+		driveSelector.setDefaultOption("Point", "Point"); // addDefault
+		driveSelector.addOption("Point w/ speed control", "Point w/ speed control"); // addObject
+		driveSelector.addOption("Z-Axis w/ speed control", "Z-Axis w/ speed control");
+		driveSelector.addOption("Z-Axis", "Z-Axis");
 		SmartDashboard.putData("Driving styles", driveSelector);
 		
-		gyroSelector.addDefault("0 : 360", "0 : 360");
-		gyroSelector.addObject("-180 : 180", "-180 : 180");
+		gyroSelector.setDefaultOption("0 : 360", "0 : 360");
+		gyroSelector.addOption("-180 : 180", "-180 : 180");
 		SmartDashboard.putData("Gyro Selector", gyroSelector);
 		
-		pistonSelector.addDefault("Manual", "Manual");
-		pistonSelector.addObject("Automatic", "Automatic");
+		pistonSelector.setDefaultOption("Manual", "Manual");
+		pistonSelector.addOption("Automatic", "Automatic");
 		SmartDashboard.putData("Piston Selector", pistonSelector);
 
 		comp.start();
 		
 		leftSide = new Spark(0);
 		rightSide = new Spark(1);
+		
+	}
+	
+	@Override
+	public void autonomousPeriodic() {
+		teleopPeriodic();
 	}
 	
 	@Override
@@ -222,7 +239,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void gyroDisplay() {
-		// Handles the gyro display for the Smart Dashboard
+		 //Handles the gyro display for the Smart Dashboard
 		String gyroStyle = gyroSelector.getSelected();
 		double angle = Math.floor(gyro.getAngle());
 		if (gyroStyle == "0 : 360") {
